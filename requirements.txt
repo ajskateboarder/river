@@ -1,0 +1,4 @@
+pyinstaller
+websockets
+selenium
+webdriver_manager
