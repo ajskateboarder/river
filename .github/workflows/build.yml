@@ -59,15 +59,12 @@ jobs:
         - name: Checkout Repository
           uses: actions/checkout@v2
 
-        - uses: fwilhe2/bump-version@main
-          id: bump
-        - run: echo ${{ steps.bump.outputs.newVersion }}
         - name: Create Release
           id: create_release
           uses: actions/create-release@v1
           with:
-            tag_name: ${{ steps.bump.outputs.newVersion }}
-            release_name: Release ${{ steps.bump.outputs.newVersion }}
+            tag_name: v1.0.0
+            release_name: Release v1.0.0
             draft: false
             prerelease: false
 
