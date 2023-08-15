@@ -3,16 +3,12 @@ name: Build
 on: [push]
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-latest]
-
-    runs-on: ${{ matrix.os }}
+  build-linux:
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.x"
@@ -20,8 +16,73 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Build the thig
+      - name: Build for Linux
         run: |
           pyi-makespec main.py --onefile --noconsole
           pyinstaller --clean main.spec
           ls dist
+      - name: Save artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: river-linux
+          path: dist/main
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Build for Windows
+        run: |
+          pyi-makespec main.py --onefile --noconsole
+          pyinstaller --clean main.spec
+      - name: Save artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: river-windows
+          path: dist/main.exe
+
+  create-release:
+      name: Create Release
+      needs: [build-linux, build-windows]
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v2
+
+        - uses: fwilhe2/bump-version@main
+          id: bump
+        - run: echo ${{ steps.bump.outputs.newVersion }}
+        - name: Create Release
+          id: create_release
+          uses: actions/create-release@v1
+          with:
+            tag_name: ${{ steps.bump.outputs.newVersion }}
+            release_name: Release ${{ steps.bump.outputs.newVersion }}
+            draft: false
+            prerelease: false
+
+        - name: Upload Linux Executable
+          uses: actions/upload-release-asset@v1
+          with:
+            upload_url: ${{ steps.create_release.outputs.upload_url }}
+            asset_path: dist/main
+            asset_name: river-linux.exe
+            asset_content_type: application/octet-stream
+
+        - name: Upload Windows Executable
+          uses: actions/upload-release-asset@v1
+          with:
+            upload_url: ${{ steps.create_release.outputs.upload_url }}
+            asset_path: dist/main.exe
+            asset_name: river-windows.exe
+            asset_content_type: application/octet-stream
