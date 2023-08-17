@@ -82,14 +82,14 @@ jobs:
           uses: actions/upload-release-asset@v1
           with:
             upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: dist/main
-            asset_name: river-linux.exe
+            asset_path: ${{ github.workspace }}/dist
+            asset_name: main
             asset_content_type: application/octet-stream
 
         - name: Upload Windows Executable
           uses: actions/upload-release-asset@v1
           with:
             upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: dist/main.exe
-            asset_name: river-windows.exe
+            asset_path: ${{ github.workspace }}/dist
+            asset_name: main.exe
             asset_content_type: application/octet-stream
