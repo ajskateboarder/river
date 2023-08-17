@@ -78,6 +78,10 @@ jobs:
             draft: false
             prerelease: false
 
+        - name: YE
+          run: |
+            ls ${{ github.workspace }}
+
         - name: Upload Linux Executable
           uses: actions/upload-release-asset@v1
           with:
@@ -86,9 +90,6 @@ jobs:
             asset_name: main
             asset_content_type: application/octet-stream
 
-        - name: YE
-          run: |
-            ls ${{ github.workspace }}
 
         - name: Upload Windows Executable
           uses: actions/upload-release-asset@v1
