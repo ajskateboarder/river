@@ -82,6 +82,9 @@ jobs:
         release_name: Release ${{ steps.version.outputs.version }}
         draft: false
         prerelease: false
+    
+    - name: LOL
+      run: ls -d */
 
     - name: Upload Linux Executable
       uses: actions/upload-release-asset@v1
