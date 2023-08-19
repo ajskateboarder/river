@@ -3,162 +3,50 @@ name: Build
 on: [push]
 
 jobs:
-  build_release:
-    runs-on: ${{ matrix.os }}
-    permissions: write-all
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
+  build-linux:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
+      - uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.x
-
+          python-version: "3.x"
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-      - name: Build
+      - name: Build for Linux
         run: |
           pyi-makespec main.py --onefile --noconsole
           pyinstaller --clean main.spec
-
-      - name: Archive Executable
-        run: |
-          if [[ "${{ matrix.os }}" == "windows_latest" ]]; then
-            mv dist/main.exe "dist/river_windows.exe"
-          else
-            mv dist/main "dist/river_linux.exe"
-          fi
-
-      - name: Save artifact
-        uses: actions/upload-artifact@v2
+          ls dist
+      - name: bottom text
+        uses: actions/upload-artifact@v3
         with:
           name: river-linux
           path: dist/main
-      - name: Get next version
-        uses: reecetech/version-increment@2023.4.1
-        id: version
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          scheme: semver
-          increment: patch
-      - name: Create Release
-        id: create_release
-        uses: iamkubi/github-release@2.0
+          python-version: "3.x"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Build for Windows
+        run: |
+          pyi-makespec main.py --onefile --noconsole
+          pyinstaller --clean main.spec
+      - name: Save artifact
+        uses: actions/upload-artifact@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ steps.version.outputs.version }}
-          name: Release ${{ steps.version.outputs.version }}
-          draft: false
-          prerelease: false
-          files: |
-            dist/river_linux
-            dist/river_windows.exe
+          name: river-windows
+          path: dist/main.exe
 
-  # build-linux:
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: "3.x"
-  #     - name: Install dependencies
-  #       run: |
-  #         python -m pip install --upgrade pip
-  #         pip install -r requirements.txt
-  #     - name: Build for Linux
-  #       run: |
-  #         pyi-makespec main.py --onefile --noconsole
-  #         pyinstaller --clean main.spec
-  #         ls dist
-
-
-
-  # build-windows:
-  #   runs-on: windows-latest
-
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: "3.x"
-  #     - name: Install dependencies
-  #       run: |
-  #         python -m pip install --upgrade pip
-  #         pip install -r requirements.txt
-  #     - name: Build for Windows
-  #       run: |
-  #         pyi-makespec main.py --onefile --noconsole
-  #         pyinstaller --clean main.spec
-  #     - name: Save artifact
-  #       uses: actions/upload-artifact@v2
-  #       with:
-  #         name: river-windows
-  #         path: dist/main.exe
-
-
-  # create-release:
-  #     name: Create Release
-  #     needs: [build-linux, build-windows]
-  #     runs-on: ubuntu-latest
-  #     permissions: write-all
-
-  #     steps:
-  #       - name: Checkout Repository
-  #         uses: actions/checkout@v2
-
-  #       - name: Get next version
-  #         uses: reecetech/version-increment@2023.4.1
-  #         id: version
-  #         with:
-  #           scheme: semver
-  #           increment: patch
-
-  #       - uses: actions/download-artifact@v3
-  #         with:
-  #           name: river-windows
-  #           path: dist/
-
-  #       - uses: actions/download-artifact@v3
-  #         with:
-  #           name: river-linux
-  #           path: dist/
-
-  #       - name: Create Release
-  #         id: create_release
-  #         uses: actions/create-release@v1
-  #         env:
-  #           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #         with:
-  #           tag_name: ${{ steps.version.outputs.version }}
-  #           release_name: Release ${{ steps.version.outputs.version }}
-  #           draft: false
-  #           prerelease: false
-
-  #       permissions: read-all
-  #       - name: Upload Linux Executable
-  #         uses: actions/upload-release-asset@v1
-  #         with:
-  #           upload_url: ${{ steps.create_release.outputs.upload_url }}
-  #           asset_path: dist
-  #           asset_name: main
-  #           asset_content_type: application/octet-stream
-
-
-  #       - name: Upload Windows Executable
-  #         uses: actions/upload-release-asset@v1
-  #         with:
-  #           upload_url: ${{ steps.create_release.outputs.upload_url }}
-  #           asset_path: dist
-  #           asset_name: main.exe
-  #           asset_content_type: application/octet-stream
