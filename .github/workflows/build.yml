@@ -62,24 +62,24 @@ jobs:
             dist/river_linux
             dist/river_windows.exe
 
-  build-linux:
-    runs-on: ubuntu-latest
+  # build-linux:
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.x"
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: Build for Linux
-        run: |
-          pyi-makespec main.py --onefile --noconsole
-          pyinstaller --clean main.spec
-          ls dist
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v4
+  #       with:
+  #         python-version: "3.x"
+  #     - name: Install dependencies
+  #       run: |
+  #         python -m pip install --upgrade pip
+  #         pip install -r requirements.txt
+  #     - name: Build for Linux
+  #       run: |
+  #         pyi-makespec main.py --onefile --noconsole
+  #         pyinstaller --clean main.spec
+  #         ls dist
 
 
 
