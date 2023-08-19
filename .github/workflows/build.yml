@@ -64,9 +64,36 @@ jobs:
     - uses: actions/download-artifact@v3
       with:
         name: river-linux
-    
-    - name: LOL
-      run: ls -R
-    
-    - name: LOL 2
-      run: ls -R dist
+
+    - uses: reecetech/version-increment@2023.4.1
+      id: version
+      with:
+        scheme: semver
+        increment: patch
+  
+    - name: Create Release
+      id: release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.version.outputs.version }}
+        release_name: Release ${{ steps.version.outputs.version }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Linux Executable
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.release.outputs.upload_url }}
+        asset_path: .
+        asset_name: main
+        asset_content_type: application/octet-stream
+
+    - name: Upload Windows Executable
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.release.outputs.upload_url }}
+        asset_path: .
+        asset_name: main.exe
+        asset_content_type: application/octet-stream
