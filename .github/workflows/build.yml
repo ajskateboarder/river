@@ -84,7 +84,7 @@ jobs:
         prerelease: false
     
     - name: LOL
-      run: ls -d */
+      run: ls
 
     - name: Upload Linux Executable
       uses: actions/upload-release-asset@v1
