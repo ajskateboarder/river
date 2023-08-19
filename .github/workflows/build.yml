@@ -31,7 +31,7 @@ jobs:
 
       - name: Archive Executable
         run: |
-          if [[ "${{ matrix.os }}" == "windows_latest" ]] then
+          if [[ "${{ matrix.os }}" == "windows_latest" ]]; then
             mv dist/main.exe "dist/river_windows.exe"
           else
             mv dist/main "dist/river_linux.exe"
