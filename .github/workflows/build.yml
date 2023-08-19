@@ -50,7 +50,7 @@ jobs:
           increment: patch
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: iamkubi/github-release@2.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
