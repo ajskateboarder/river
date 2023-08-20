@@ -22,7 +22,7 @@ class Amazon:
     def ids(self, query):
         self.driver.get(f"https://www.amazon.com/s?k={quote_plus(query)}")
         self.driver.execute_script(f"window.scrollBy(0, 1000)")
-        return self.driver.find_element("id", "search").get_attribute("innerHTML")
+        return self.driver.page_source
 
 @functools.lru_cache()
 def browser():
