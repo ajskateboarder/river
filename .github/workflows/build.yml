@@ -91,7 +91,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        asset_path: '["dist/main.exe", "dist/main"]'
+        asset_path: '["main.exe", "main"]'
         asset_name: "eeee"
         asset_content_type: application/zip
         upload_url: ${{ steps.release.outputs.upload_url }}
