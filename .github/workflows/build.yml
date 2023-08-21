@@ -61,15 +61,15 @@ jobs:
     - uses: actions/download-artifact@v3
       with:
         name: river-windows
-        path: dist/windows.exe
+        path: dist
 
     - uses: actions/download-artifact@v3
       with:
         name: river-linux
-        path: dist/linux
+        path: dist
     
     - name: ZIP
-      run: zip river.zip dist/linux dist/windows.exe
+      run: zip river.zip dist/main dist/main.exe
 
     - uses: reecetech/version-increment@2023.4.1
       id: version
@@ -87,12 +87,6 @@ jobs:
         release_name: Release ${{ steps.version.outputs.version }}
         draft: false
         prerelease: false
-    
-    - name: benefits
-      run: |
-        stat dist/windows.exe
-        stat dist/linux
-        ls -la dist
 
     - name: Upload Release Asset
       id: upload-release-asset
