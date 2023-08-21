@@ -92,7 +92,7 @@ jobs:
       run: |
         stat dist/windows.exe
         stat dist/linux
-        ls -la
+        ls -la dist
 
     - name: Upload stuff
       uses: actions/upload-release-asset@v1
