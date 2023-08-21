@@ -91,7 +91,18 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        asset_path: 'dist/main.exe,dist/main'
-        asset_name: "eeee"
+        asset_path: 'dist/main.exe'
+        asset_name: "main.exe"
+        asset_content_type: application/zip
+        upload_url: ${{ steps.release.outputs.upload_url }}
+
+    - name: Oh upload this too
+      id: upload-release-asset2
+      uses: sekwah41/upload-release-assets@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        asset_path: 'dist/main'
+        asset_name: "main"
         asset_content_type: application/zip
         upload_url: ${{ steps.release.outputs.upload_url }}
