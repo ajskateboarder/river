@@ -83,8 +83,11 @@ jobs:
         draft: false
         prerelease: false
     
-    - name: LOL
-      run: ls
+    - name: benefits
+      run: |
+        stat main
+        stat main.exe
+        ls
 
     - name: Upload Linux Executable
       uses: actions/upload-release-asset@v1
