@@ -1,6 +1,10 @@
 name: Build
 
-on: [push]
+on:
+  push:
+    paths:
+      - 'main.py'
+      - '.github/workflows/build.yml'
 
 jobs:
   build-linux:
