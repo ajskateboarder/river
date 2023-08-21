@@ -67,9 +67,6 @@ jobs:
       with:
         name: river-linux
         path: dist
-    
-    - name: ZIP
-      run: zip river.zip dist/main dist/main.exe
 
     - uses: reecetech/version-increment@2023.4.1
       id: version
@@ -77,7 +74,7 @@ jobs:
         scheme: semver
         increment: patch
   
-    - name: Create Release
+    - name: Create release
       id: release
       uses: actions/create-release@v1
       env:
@@ -88,13 +85,12 @@ jobs:
         draft: false
         prerelease: false
 
-    - name: Upload Release Asset
+    - name: Upload builds
       id: upload-release-asset
       uses: sekwah41/upload-release-assets@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        asset_path: ./river.zip
-        asset_name: river.zip
+        asset_path: '["dist/main.exe", "dist/main"]'
         asset_content_type: application/zip
         upload_url: ${{ steps.release.outputs.upload_url }}
