@@ -132,15 +132,17 @@ def browser():
     return Amazon()
 
 def handler(websocket: ServerConnection):
-    def send(message):
-        websocket.send(json.dumps(message))
+    def send(message, typ):
+        websocket.send(json.dumps({**message, "type": typ}))
     for message in websocket:
         data = json.loads(message)
         if data["command"] == "login":
+            send({"message": "Logging in..."}, "status")
             browser().login(data["username"], data["password"])
+            send({"message": "Logging in done"}, "status")
         if data["command"] == "scrape":
             props = browser().proportions(data["asin"])
-            browser().scrape(data["asin"], send, props)
+            browser().scrape(data["asin"], functools.partial(send, typ="response"), props)
 
 def main():
     with serve(handler, "", 8001) as server:
