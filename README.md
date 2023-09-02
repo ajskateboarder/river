@@ -17,15 +17,37 @@ Check `dist/` for an executable. Running the EXE should start the server on `ws:
 
 ## Usage
 
-Connect to the server using any WebSocket client and send a URL.
+Connect to the server using any WebSocket client and send any of the following commands as objects:
+
+```json
+{
+    command: "login"
+    username: string
+    password: string
+}
+```
+
+```json
+{
+    command: "scrape"
+    asin: string
+}
+```
 
 ```py
 from websockets.sync.client import connect
+import json
 with connect("ws://localhost:8001", max_size=None) as websocket:
-    websocket.send("https://www.amazon.com/s?k=laptop")
-    message = websocket.recv() # should be a bunch of HTML
-    with open("document.html", "w", encoding="utf-8") as fh:
-        fh.write(message)
+    websocket.send(
+        json.dumps(
+            {
+                command: "login"
+                username: "john@doe.com"
+                password: "??sEcret_!04$"
+            }
+        )
+    )
+    ...
 ```
 
 ## Possible errors
