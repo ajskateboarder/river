@@ -28,6 +28,7 @@ class Amazon:
                     ),
                 )
         )
+        self.logged_in = False
 
     @staticmethod
     def select_reviews(content):
@@ -54,6 +55,8 @@ class Amazon:
             self._login_single(browser, email, password)
 
     def login(self, email: str, password: str) -> None:
+        if self.logged_in:
+            return
         with ThreadPoolExecutor() as executor:
             executor.map(
                 self._login_single,
@@ -61,6 +64,7 @@ class Amazon:
                 repeat(email),
                 repeat(password),
             )
+        self.logged_in = True
 
     def proportions(
         self, asin: str, total: int = 500
