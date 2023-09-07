@@ -1,6 +1,6 @@
 import functools
 from itertools import repeat, count, zip_longest
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed, Future
 import json
 
 from websockets.sync.server import serve
@@ -89,7 +89,7 @@ class Amazon:
         category: int,
         callback,
         limit,
-    ) -> None:
+    ):
         map_star = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five"}
 
         if limit:
@@ -105,6 +105,7 @@ class Amazon:
                 if next(counter) >= limit:  # type: ignore
                     return
                 callback({**item, "productId": asin})
+        return True
 
     def scrape(
         self,
@@ -116,6 +117,7 @@ class Amazon:
             proportions = []
 
         with ThreadPoolExecutor() as executor:
+            futures: list[Future] = []
             for i, browser, prop in zip_longest(
                 range(1, 6), self.browsers, proportions
             ):
@@ -130,6 +132,9 @@ class Amazon:
                 )
                 if future.exception():
                     raise future.exception()
+                futures.append(future)
+        
+        return all(f.result() is True for f in futures)
 
 @functools.lru_cache()
 def browser():
@@ -147,6 +152,7 @@ def handler(websocket: ServerConnection):
         if data["command"] == "scrape":
             props = browser().proportions(data["asin"])
             browser().scrape(data["asin"], functools.partial(send, typ="response"), props)
+            send({"message": "Scraping done"}, "status")
 
 def main():
     with serve(handler, "", 8001) as server:
