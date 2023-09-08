@@ -17,7 +17,7 @@ class Amazon:
     # adapted from wordsmyth crawling
     def __init__(self) -> None:
         opts = Options()
-        # opts.add_argument("--headless")
+        opts.add_argument("--headless")
         path = GeckoDriverManager().install()
         with ThreadPoolExecutor() as executor:
             self.browsers = list(
