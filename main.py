@@ -17,7 +17,7 @@ class Amazon:
     # adapted from wordsmyth crawling
     def __init__(self) -> None:
         opts = Options()
-        opts.add_argument("--headless")
+        # opts.add_argument("--headless")
         path = GeckoDriverManager().install()
         with ThreadPoolExecutor() as executor:
             self.browsers = list(
@@ -66,7 +66,7 @@ class Amazon:
             )
         self.logged_in = True
 
-    def proportions(
+    def product_info(
         self, asin: str, total: int = 500
     ):
         self.browsers[1].get(f"https://amazon.com/product-reviews/{asin}")
@@ -74,13 +74,20 @@ class Amazon:
         percentages = self.browsers[1].find_element(
             "css selector", ".histogram"
         ).text.split("\n")[1::2]
+
+        image = self.browsers[1].find_element("css selector", "img[data-hook='cr-product-image']")
+        product_info = {
+            "title": image.get_attribute("alt"),
+            "image": image.get_attribute("src")
+        }
+
         parsed = list(map(lambda p: int(p.replace("%", "")) / 100, percentages))
         if total is None:
             return parsed
         parsed = list(map(lambda x: x * 500, parsed))
         while any(x > 100 for x in parsed):
             parsed = list(map(lambda x: x * 0.99, parsed))
-        return list(reversed(list(map(lambda x: int(x) + 1, parsed))))
+        return list(reversed(list(map(lambda x: int(x) + 1, parsed)))), product_info
 
     def _scrape_single(
         self,
@@ -150,7 +157,8 @@ def handler(websocket: ServerConnection):
             browser().login(data["username"], data["password"])
             send({"message": "Logging in done"}, "status")
         if data["command"] == "scrape":
-            props = browser().proportions(data["asin"])
+            props, product = browser().product_info(data["asin"])
+            send(product, "response_product")
             browser().scrape(data["asin"], functools.partial(send, typ="response"), props)
             send({"message": "Scraping done"}, "status")
 
