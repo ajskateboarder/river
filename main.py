@@ -76,9 +76,11 @@ class Amazon:
         ).text.split("\n")[1::2]
 
         image = self.browsers[1].find_element("css selector", "img[data-hook='cr-product-image']")
+        rating = self.browsers[1].find_element("css selector", "i[data-hook='average-star-rating']")
         product_info = {
             "title": image.get_attribute("alt"),
-            "image": image.get_attribute("src")
+            "image": image.get_attribute("src"),
+            "rating": rating.text.split(" ")[0]
         }
 
         parsed = list(map(lambda p: int(p.replace("%", "")) / 100, percentages))
